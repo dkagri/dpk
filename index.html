@@ -1,32 +1,210 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>DPK Creation | Web Designing Company</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-body{font-family:Poppins,Arial;margin:0}
-header{background:#203a43;color:#fff;text-align:center;padding:80px 20px}
-nav{background:#111;padding:10px;text-align:center}
-nav a{color:#fff;margin:0 15px;text-decoration:none}
-section{padding:40px}
-footer{background:#111;color:#fff;text-align:center;padding:15px}
-</style>
-</head>
-<body>
-<nav>
-<a href="index.html">Home</a>
-<a href="pricing.html">Pricing</a>
-<a href="contact.html">Contact</a>
-</nav>
-<header>
-<h1>DPK Creation</h1>
-<p>Professional Web Designing Company</p>
-</header>
-<section>
-<h2>Welcome</h2>
-<p>We build modern, responsive and business-ready websites.</p>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DPK Creation | Professional Web Designing Company</title>  <!-- SEO -->  <meta name="description" content="DPK Creation is a professional web designing company offering modern, responsive and affordable websites for businesses." />
+  <meta name="keywords" content="DPK Creation, Web Design Sri Lanka, Website Development, Business Website" />  <!-- Google Font -->  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">  <!-- Font Awesome -->  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Poppins',sans-serif;line-height:1.6;color:#333;}
+    a{text-decoration:none;}
+
+    /* Header */
+    header{
+      background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+      color:#fff;
+      padding:80px 20px;
+      text-align:center;
+      animation:fadeIn 1.5s
+    }
+    header h1{font-size:3rem;font-weight:700;}
+    header p{margin:15px 0;font-size:1.1rem;}
+    header .btn{
+      display:inline-block;
+      margin-top:20px;
+      padding:12px 30px;
+      background:#25D366;
+      color:#fff;
+      border-radius:30px;
+      font-weight:600;
+    }
+
+    /* Navbar */
+    nav{
+      background:#111;
+      padding:10px 20px;
+      position:sticky;
+      top:0;
+      z-index:1000;
+    }
+    nav ul{list-style:none;display:flex;justify-content:center;gap:25px;}
+    nav ul li a{color:#fff;font-weight:500;}
+    nav ul li a:hover{color:#25D366;}
+
+    /* Sections */
+    section{padding:70px 20px;max-width:1100px;margin:auto;}
+    section h2{text-align:center;margin-bottom:40px;font-size:2.2rem;color:#203a43;}
+
+    /* About */
+    .about p{text-align:center;max-width:800px;margin:auto;}
+
+    /* Services */
+    .services{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+      gap:25px;
+    }
+    .service-box{
+      background:#f9f9f9;
+      padding:30px;
+      border-radius:15px;
+      text-align:center;
+      box-shadow:0 5px 15px rgba(0,0,0,0.08);
+      transition:transform 0.3s;
+    }
+    .service-box:hover{transform:translateY(-8px);}
+    .service-box i{font-size:40px;color:#25D366;margin-bottom:15px;}
+
+    /* Portfolio */
+    .portfolio{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:20px;
+    }
+    .portfolio div{
+      background:#203a43;
+      color:#fff;
+      padding:40px;
+      border-radius:15px;
+      text-align:center;
+    }
+
+    /* Process */
+    .process{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:20px;
+      text-align:center;
+    }
+    .process div{padding:20px;border:2px dashed #25D366;border-radius:15px;}
+
+    /* Contact */
+    .contact{text-align:center;}
+    .contact a{
+      display:inline-block;
+      margin-top:15px;
+      padding:12px 25px;
+      background:#25D366;
+      color:#fff;
+      border-radius:25px;
+      font-weight:600;
+    }
+.whatsapp-float{
+  position:fixed;bottom:20px;right:20px;
+  color:#fff;
+  font-size:30px;padding:15px;
+  border-radius:50%
+}
+
+    /* Footer */
+    footer{
+      background:#111;
+      color:#fff;
+      text-align:center;
+      padding:20px;
+      margin-top:50px;
+    }
+    footer p{font-size:0.9rem;}
+
+    /* Responsive */
+    @media(max-width:768px){
+      header h1{font-size:2.2rem;}
+      nav ul{flex-wrap:wrap;gap:15px;}
+    }
+  </style></head>
+<body><nav>
+  <ul>
+    <li><a href="#home">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav><header id="home">
+  <h1>DPK Creation</h1>
+  <p>Professional Web Designing & Digital Solutions</p>
+  <p>We build modern, responsive & business-ready websites</p>
+  <a class="btn" href="https://wa.me/94725989935" target="_blank">WhatsApp Us</a>
+</header><section id="about" class="about">
+  <h2>About DPK Creation</h2>
+  <p>
+    DPK Creation is a professional web designing company focused on creating
+    attractive, fast, mobile-friendly and SEO optimized websites. Our goal is
+    to help businesses grow online with modern technologies and creative design.
+  </p>
+</section><section id="services">
+  <h2>Our Services</h2>
+  <div class="services">
+    <div class="service-box">
+      <i class="fas fa-laptop-code"></i>
+      <h3>Website Design</h3>
+      <p>Business, Personal, Portfolio & Corporate websites.</p>
+    </div>
+    <div class="service-box">
+      <i class="fas fa-shopping-cart"></i>
+      <h3>E‑Commerce Websites</h3>
+      <p>Online shops with payment & product management.</p>
+    </div>
+    <div class="service-box">
+      <i class="fas fa-mobile-alt"></i>
+      <h3>Responsive Design</h3>
+      <p>Perfect view on mobile, tablet & desktop.</p>
+    </div>
+    <div class="service-box">
+      <i class="fas fa-search"></i>
+      <h3>SEO & Optimization</h3>
+      <p>Google-friendly & fast loading websites.</p>
+    </div>
+    <div class="service-box">
+      <i class="fas fa-tools"></i>
+      <h3>Maintenance</h3>
+      <p>Monthly updates & technical support.</p>
+    </div>
+    <div class="service-box">
+      <i class="fas fa-cloud"></i>
+      <h3>Hosting & Domain</h3>
+      <p>Free or paid hosting setup assistance.</p>
+    </div>
+  </div>
+</section><section id="portfolio">
+  <h2>Sample Projects</h2>
+  <div class="portfolio">
+    <div>Business Website</div>
+    <div>Restaurant Website</div>
+    <div>Online Shop</div>
+    <div>Hotel Website</div>
+    <div>Personal Portfolio</div>
+    <div>CV / Resume Website</div>
+  </div>
+</section><section id="process">
+  <h2>Our Working Process</h2>
+  <div class="process">
+    <div>1. Client Requirement Analysis</div>
+    <div>2. UI / UX Design</div>
+    <div>3. Development</div>
+    <div>4. Testing & Review</div>
+    <div>5. Launch & Support</div>
+  </div>
+</section><section id="contact" class="contact">
+  <h2>Contact Us</h2>
+  <p>Ready to grow your business with a professional website?</p>
+  <a href="contact.html" target="_blank">Contact Us</a>
+  <a href="https://wa.me/94725989935" class="whatsapp-float" target="_blank">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
 </section>
-<footer>&copy; 2026 DPK Creation</footer>
-</body>
-</html>
+<footer>
+  <p>&copy; 2026 DPK Creation. All Rights Reserved.</p>
+</footer><!-- ================= PRICING PACKAGES PAGE ================= --><!-- Save as pricing.html --><!-- ================= CONTACT PAGE ================= --><!-- Save as contact.html --></body>
+  </html>
