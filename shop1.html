@@ -3,68 +3,63 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Live Shop</title>
+<title>Live Online Shop</title>
 
-<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
 body{font-family:Arial;background:#f5f5f5;margin:0}
-header{background:#0d6efd;color:#fff;padding:15px;display:flex;justify-content:space-between}
+header{background:#0d6efd;color:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center}
 .cart{cursor:pointer}
 
 /* PRODUCT GRID */
 .products{padding:20px}
 .grid{display:grid;gap:20px}
-
-/* Desktop 5 products */
 @media(min-width:1200px){.grid{grid-template-columns:repeat(5,1fr)}}
-/* Tablet */
 @media(max-width:1199px){.grid{grid-template-columns:repeat(3,1fr)}}
-/* Mobile */
-@media(max-width:600px){.grid{grid-template-columns:1fr}}
+@media(max-width:600px){.grid{grid-template-columns:1fr)}}
 
 .card{
   background:#fff;padding:15px;border-radius:10px;
   box-shadow:0 5px 10px rgba(0,0,0,.1);text-align:center
 }
 .card img{width:100%;height:160px;object-fit:contain}
-.price{color:#0d6efd;font-weight:bold}
+.price{color:#0d6efd;font-weight:bold;margin:5px 0}
 select,button{width:100%;padding:8px;margin-top:5px}
 button{background:#0d6efd;color:#fff;border:none;border-radius:5px}
 
-/* CART BAR */
+/* Pagination */
+.pagination{text-align:center;margin:20px}
+.pagination button{width:auto;padding:6px 12px}
+
+/* Cart bar */
 .cart-bar{
   position:sticky;bottom:0;background:#fff;
-  padding:10px;box-shadow:0 -2px 5px rgba(0,0,0,.1);
-  display:flex;justify-content:space-between;align-items:center
+  padding:10px;display:flex;justify-content:space-between;
+  box-shadow:0 -2px 5px rgba(0,0,0,.1)
 }
 
-/* CART MODAL */
+/* Cart Modal */
 #cartModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5)}
 .cartBox{background:#fff;max-width:400px;margin:80px auto;padding:15px;border-radius:10px}
 .cartItem{display:flex;justify-content:space-between;margin:8px 0}
+.cartItem button{width:auto;padding:4px 8px}
 
-/* CHECKOUT */
+/* Checkout */
 #checkout{display:none;padding:20px}
-input{width:100%;padding:10px;margin:6px 0}
-.whatsapp{background:#25d366;color:#fff;padding:12px;border:none;width:100%}
-
-/* Pagination */
-.pagination{text-align:center;margin:20px}
-.pagination button{width:auto;margin:0 5px}
-
-/* Footer */
-footer{
-  background:#222;color:#fff;text-align:center;
-  padding:15px;font-size:14px
-}
+input{width:100%;padding:10px;margin:8px 0}
+.whatsapp{background:#25d366;color:#fff;border:none;padding:12px}
 
 /* Floating WhatsApp */
 .whatsapp-float{
   position:fixed;bottom:80px;right:20px;
   background:#25d366;color:#fff;
   font-size:26px;padding:15px;border-radius:50%
+}
+
+footer{
+  background:#222;color:#fff;text-align:center;
+  padding:15px;font-size:14px
 }
 </style>
 </head>
@@ -86,9 +81,8 @@ footer{
   <button onclick="nextPage()">Next ➡</button>
 </div>
 
-<!-- CART BAR -->
 <div class="cart-bar">
-  <div>Total Items: <span id="cartCountBottom">0</span></div>
+  <div>Items: <span id="cartCountBottom">0</span></div>
   <button onclick="openCart()">View Cart</button>
 </div>
 
@@ -106,13 +100,9 @@ footer{
 <!-- CHECKOUT -->
 <div id="checkout">
   <h2>Checkout</h2>
-  <input id="name" placeholder="Your Name">
-  <input id="phone" placeholder="Phone Number">
-  <input id="address" placeholder="Address">
   <button class="whatsapp" onclick="whatsappOrder()">Order via WhatsApp</button>
 </div>
 
-<!-- Floating WhatsApp -->
 <a href="https://wa.me/94725989935" target="_blank" class="whatsapp-float">
   <i class="fab fa-whatsapp"></i>
 </a>
@@ -121,71 +111,66 @@ footer{
   © 2026 Live Online Shop. All Rights Reserved.
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
 const sheetUrl =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vT-khzV32sk21nggqEKQ083HEbitHgS4ojE9z7T7Y9qvQ_JRCHcWBhq-HPT3W8fPA/pub?output=CSV";
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vT-khzV32sk21nggqEKQ083HEbitHgS4ojE9z7T7Y9qvQ_JRCHcWBhq-HPT3W8fPA/pub?output=csv"
+
+let products=[], cart=JSON.parse(localStorage.getItem("cart"))||[];
+let currentPage=1, perPage=20;
+
 updateCartCount();
 
-/* CSV PARSER */
+/* Simple CSV parser */
 function parseCSV(text){
-  const rows=[], row=[], cur="";
-  let r=[], c="", q=false;
+  let rows=[],r=[],c="",q=false;
   for(let ch of text){
     if(ch=='"') q=!q;
-    else if(ch=="," && !q){ r.push(c); c=""; }
-    else if(ch=="\n" && !q){ r.push(c); rows.push(r); r=[]; c=""; }
+    else if(ch==","&&!q){r.push(c);c="";}
+    else if(ch=="\n"&&!q){r.push(c);rows.push(r);r=[];c="";}
     else c+=ch;
   }
-  r.push(c); rows.push(r);
-  return rows;
+  r.push(c);rows.push(r);return rows;
 }
 
-/* LOAD PRODUCTS */
+/* Load Products */
 fetch(sheetUrl)
 .then(r=>r.text())
 .then(csv=>{
-  const data = parseCSV(csv);
-  const rows = data.slice(1); // skip header
+  const data=parseCSV(csv).slice(1);
+  products=data.filter(r=>r[0] && Number(r[3])>0);
+  renderProducts();
+});
+
+function renderProducts(){
+  const start=(currentPage-1)*perPage;
+  const pageItems=products.slice(start,start+perPage);
   let html="";
-
-  rows.forEach((cols,i)=>{
-    if(!cols[0]) return;
-
-    const id = cols[0];
-    const name = cols[1];
-    const price = Number(cols[2]);
-    const stock = Number(cols[3]);
-    const img = cols[4] || "https://via.placeholder.com/300";
-
-    if(stock<=0) return; // 📦 auto hide out of stock
-
+  pageItems.forEach(p=>{
     html+=`
     <div class="card">
-      <img src="${img}" alt="${name}">
-      <h3>${name}</h3>
-      <div class="price">Rs.${price}</div>
-
-      <select id="qty-${id}">
-        ${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join("")}
+      <img src="${p[4]}">
+      <h3>${p[1]}</h3>
+      <div class="price">Rs.${p[2]}</div>
+      <select id="qty-${p[0]}">
+        <option>1</option><option>2</option><option>3</option>
       </select>
-
-      <button onclick="addToCart('${name}',${price},'qty-${id}')">
+      <button onclick="addToCart('${p[1]}',${p[2]},'qty-${p[0]}')">
         Add to Cart
       </button>
     </div>`;
   });
+  productGrid.innerHTML=html;
+  pageInfo.innerText=`Page ${currentPage} / ${Math.ceil(products.length/perPage)}`;
+}
 
-  document.getElementById("productGrid").innerHTML = html;
-});
+function nextPage(){if(currentPage<Math.ceil(products.length/perPage)){currentPage++;renderProducts();}}
+function prevPage(){if(currentPage>1){currentPage--;renderProducts();}}
 
-/* CART */
-function addToCart(name,price,qtyId){
-  let qty=+document.getElementById(qtyId).value;
-  let item=cart.find(i=>i.name===name);
-  if(item) item.qty+=qty;
-  else cart.push({name,price,qty});
+/* Cart */
+function addToCart(n,p,q){
+  let qty=+document.getElementById(q).value;
+  let item=cart.find(i=>i.name===n);
+  item?item.qty+=qty:cart.push({name:n,price:p,qty});
   saveCart();
 }
 
@@ -195,57 +180,43 @@ function saveCart(){
 }
 
 function updateCartCount(){
-  let c=0; cart.forEach(i=>c+=i.qty);
-  document.getElementById("cartCount").innerText=c;
+  let c=0;cart.forEach(i=>c+=i.qty);
+  cartCount.innerText=c;
+  cartCountBottom.innerText=c;
 }
 
-function openCart(){
-  document.getElementById("cartModal").style.display="block";
-  renderCart();
-}
-function closeCart(){
-  document.getElementById("cartModal").style.display="none";
-}
+function openCart(){cartModal.style.display="block";renderCart();}
+function closeCart(){cartModal.style.display="none";}
 
 function renderCart(){
-  let box=document.getElementById("cartItems");
-  let total=0; box.innerHTML="";
-  cart.forEach((i,idx)=>{
-    total+=i.price*i.qty;
-    box.innerHTML+=`
+  cartItems.innerHTML="";let t=0;
+  cart.forEach((i,x)=>{
+    t+=i.price*i.qty;
+    cartItems.innerHTML+=`
     <div class="cartItem">
       <div>${i.name}<br>Rs.${i.price} × ${i.qty}</div>
       <div>
-        <button onclick="changeQty(${idx},1)">+</button>
-        <button onclick="changeQty(${idx},-1)">−</button>
-        <button onclick="removeItem(${idx})">❌</button>
+        <button onclick="changeQty(${x},1)">+</button>
+        <button onclick="changeQty(${x},-1)">−</button>
+        <button onclick="removeItem(${x})">❌</button>
       </div>
     </div>`;
   });
-  document.getElementById("total").innerText=total;
+  total.innerText=t;
 }
 
-function changeQty(i,n){
-  cart[i].qty+=n;
-  if(cart[i].qty<=0) cart.splice(i,1);
-  saveCart(); renderCart();
-}
-function removeItem(i){
-  cart.splice(i,1);
-  saveCart(); renderCart();
-}
+function changeQty(i,n){cart[i].qty+=n;if(cart[i].qty<=0)cart.splice(i,1);saveCart();renderCart();}
+function removeItem(i){cart.splice(i,1);saveCart();renderCart();}
 
-/* CHECKOUT */
+/* Checkout */
 function goCheckout(){
   closeCart();
   document.querySelector(".products").style.display="none";
-  document.getElementById("checkout").style.display="block";
+  checkout.style.display="block";
 }
 
 function whatsappOrder(){
-  const n=name.value,p=phone.value,a=address.value;
-  if(!n||!p||!a) return alert("Fill all fields");
-  let msg=`Order:%0AName:${n}%0APhone:${p}%0AAddress:${a}%0A`;
+  let msg=`Order from ${name.value}%0A`;
   let t=0;
   cart.forEach(i=>{
     msg+=`${i.name} x ${i.qty} = Rs.${i.price*i.qty}%0A`;
@@ -255,5 +226,6 @@ function whatsappOrder(){
   window.open(`https://wa.me/94725989935?text=${msg}`);
 }
 </script>
+
 </body>
-  </html>
+                                                                         </html>
