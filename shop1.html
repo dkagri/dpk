@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Shop</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: Arial, sans-serif;
+}
+
+body{
+  background:#f5f5f5;
+}
+
+/* HEADER */
+header{
+  background:#0d6efd;
+  color:white;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+header h1{
+  font-size:22px;
+}
+
+.cart{
+  font-size:16px;
+  cursor:pointer;
+}
+
+/* HERO */
+.hero{
+  background:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),
+  url("https://images.unsplash.com/photo-1523275335684-37898b6baf30");
+  background-size:cover;
+  color:white;
+  padding:60px 20px;
+  text-align:center;
+}
+
+.hero h2{
+  font-size:30px;
+  margin-bottom:10px;
+}
+
+/* PRODUCTS */
+.products{
+  padding:30px 15px;
+}
+
+.products h2{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.product-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+}
+
+.card{
+  background:white;
+  border-radius:10px;
+  padding:15px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+  text-align:center;
+}
+
+.card img{max-width:100%;
+  border-radius:8px;
+  margin:10px 0;
+}
+
+.card h3{
+  margin:10px 0;
+}
+
+.price{
+  color:#0d6efd;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+button{
+  background:#0d6efd;
+  color:white;
+  border:none;
+  padding:10px 15px;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#084298;
+}
+
+/* CART BOX */
+.cart-box{
+  position:fixed;
+  bottom:15px;
+  right:15px;
+  background:#25d366;
+  color:white;
+  padding:15px 20px;
+  border-radius:50px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+/* FOOTER */
+footer{
+  background:#222;
+  color:white;
+  text-align:center;
+  padding:15px;
+  margin-bottom:10px;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+  header h1{
+    font-size:18px;
+  }
+  .hero h2{
+    font-size:22px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>My Online Shop</h1>
+  <div class="cart">🛒 Cart: <span id="cartCount">0</span></div>
+</header>
+
+<section class="hero">
+  <h2>Best Products at Best Price</h2>
+  <p>Order easily via WhatsApp</p>
+</section>
+
+<section class="products">
+  <h2>Our Products</h2>
+
+  <div class="product-grid">
+
+    <div class="card">
+      <img src="phone.jpg">
+      <h3>Smart Phone</h3>
+      <div class="price">Rs. 45,000</div>
+      <button onclick="addToCart('Smart Phone',45000)">Add to Cart</button>
+    </div>
+
+    <div class="card">
+      <img src="Headphone.jpg">
+      <h3>Headphone</h3>
+      <div class="price">Rs. 3,500</div>
+      <button onclick="addToCart('Headphone',3500)">Add to Cart</button>
+    </div>
+
+    <div class="card">
+      <img src="Smart Watch.jpg">
+      <h3>Smart Watch</h3>
+      <div class="price">Rs. 8,000</div>
+      <button onclick="addToCart('Smart Watch',8000)">Add to Cart</button>
+    </div>
+
+  </div>
+</section>
+
+<div class="cart-box" onclick="whatsappOrder()">
+  📲 Order via WhatsApp
+</div>
+
+<footer>
+  © 2026 My Shop | All Rights Reserved
+</footer>
+
+<script>
+let cart = [];
+let cartCount = document.getElementById("cartCount");
+
+function addToCart(name, price){
+  cart.push({name, price});
+  cartCount.innerText = cart.length;
+  alert(name + " added to cart");
+}
+
+function whatsappOrder(){
+  if(cart.length === 0){
+    alert("Cart is empty");
+    return;
+  }
+
+  let message = "Hello, I want to order:%0A";
+  let total = 0;
+
+  cart.forEach(item=>{
+    message += `- ${item.name} : Rs.${item.price}%0A`;
+    total += item.price;
+  });
+
+  message += `%0ATotal: Rs.${total}`;
+
+  let phone = "947XXXXXXXX"; // 👉 உங்கள் WhatsApp number
+  let url = `https://wa.me/${phone}?text=${message}`;
+  window.open(url,"_blank");
+}
+</script>
+
+</body>
+</html>
