@@ -123,77 +123,137 @@ footer{
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
-const sheetUrl="https://docs.google.com/spreadsheets/d/e/2PACX-1vT-khzV32sk21nggqEKQ083HEbitHgS4ojE9z7T7Y9qvQ_JRCHcWBhq-HPT3W8fPA/pub?output=csv";
+const sheetUrl =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vT-khzV32sk21nggqEKQ083HEbitHgS4ojE9z7T7Y9qvQ_JRCHcWBhq-HPT3W8fPA/pub?output=CSV";
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+updateCartCount();
 
-let products=[],cart=JSON.parse(localStorage.getItem("cart"))||[];
-let page=1,perPage=20;
+/* CSV PARSER */
+function parseCSV(text){
+  const rows=[], row=[], cur="";
+  let r=[], c="", q=false;
+  for(let ch of text){
+    if(ch=='"') q=!q;
+    else if(ch=="," && !q){ r.push(c); c=""; }
+    else if(ch=="\n" && !q){ r.push(c); rows.push(r); r=[]; c=""; }
+    else c+=ch;
+  }
+  r.push(c); rows.push(r);
+  return rows;
+}
 
-Papa.parse(sheetUrl,{
- download:true,header:true,
- complete:r=>{products=r.data;render()}
+/* LOAD PRODUCTS */
+fetch(sheetUrl)
+.then(r=>r.text())
+.then(csv=>{
+  const data = parseCSV(csv);
+  const rows = data.slice(1); // skip header
+  let html="";
+
+  rows.forEach((cols,i)=>{
+    if(!cols[0]) return;
+
+    const id = cols[0];
+    const name = cols[1];
+    const price = Number(cols[2]);
+    const stock = Number(cols[3]);
+    const img = cols[4] || "https://via.placeholder.com/300";
+
+    if(stock<=0) return; // 📦 auto hide out of stock
+
+    html+=`
+    <div class="card">
+      <img src="${img}" alt="${name}">
+      <h3>${name}</h3>
+      <div class="price">Rs.${price}</div>
+
+      <select id="qty-${id}">
+        ${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join("")}
+      </select>
+
+      <button onclick="addToCart('${name}',${price},'qty-${id}')">
+        Add to Cart
+      </button>
+    </div>`;
+  });
+
+  document.getElementById("productGrid").innerHTML = html;
 });
 
-function render(){
- let start=(page-1)*perPage,end=start+perPage;
- let html="";
- products.slice(start,end).forEach((p,i)=>{
- html+=`
- <div class="card">
-  <img src="${p['Main Image']}">
-  <h4>${p['Product Name']}</h4>
-  <div class="price">Rs.${p['Price (Rs)']}</div>
-  <select id="q${i}">${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join("")}</select>
-  <button onclick="add('${p['Product Name']}',${p['Price (Rs)']},'q${i}')">Add to Cart</button>
- </div>`;
- });
- document.getElementById("productGrid").innerHTML=html;
- document.getElementById("pageInfo").innerText=`Page ${page}`;
+/* CART */
+function addToCart(name,price,qtyId){
+  let qty=+document.getElementById(qtyId).value;
+  let item=cart.find(i=>i.name===name);
+  if(item) item.qty+=qty;
+  else cart.push({name,price,qty});
+  saveCart();
 }
 
-function nextPage(){if(page*perPage<products.length){page++;render()}}
-function prevPage(){if(page>1){page--;render()}}
-
-function add(n,p,q){
- let qty=parseInt(document.getElementById(q).value);
- let f=cart.find(i=>i.name===n);
- f?f.qty+=qty:cart.push({name:n,price:p,qty});
- save();
+function saveCart(){
+  localStorage.setItem("cart",JSON.stringify(cart));
+  updateCartCount();
 }
 
-function save(){
- localStorage.setItem("cart",JSON.stringify(cart));
- let c=cart.reduce((a,b)=>a+b.qty,0);
- cartCount.innerText=cartCountBottom.innerText=c;
+function updateCartCount(){
+  let c=0; cart.forEach(i=>c+=i.qty);
+  document.getElementById("cartCount").innerText=c;
 }
 
-function openCart(){cartModal.style.display="block";showCart()}
-function closeCart(){cartModal.style.display="none"}
-
-function showCart(){
- let t=0,box=cartItems;box.innerHTML="";
- cart.forEach((i,x)=>{
- t+=i.price*i.qty;
- box.innerHTML+=`
- <div class="cartItem">
-  ${i.name} x ${i.qty}
-  <button onclick="cart.splice(${x},1);save();showCart()">❌</button>
- </div>`;
- });
- total.innerText=t;
+function openCart(){
+  document.getElementById("cartModal").style.display="block";
+  renderCart();
+}
+function closeCart(){
+  document.getElementById("cartModal").style.display="none";
 }
 
+function renderCart(){
+  let box=document.getElementById("cartItems");
+  let total=0; box.innerHTML="";
+  cart.forEach((i,idx)=>{
+    total+=i.price*i.qty;
+    box.innerHTML+=`
+    <div class="cartItem">
+      <div>${i.name}<br>Rs.${i.price} × ${i.qty}</div>
+      <div>
+        <button onclick="changeQty(${idx},1)">+</button>
+        <button onclick="changeQty(${idx},-1)">−</button>
+        <button onclick="removeItem(${idx})">❌</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById("total").innerText=total;
+}
+
+function changeQty(i,n){
+  cart[i].qty+=n;
+  if(cart[i].qty<=0) cart.splice(i,1);
+  saveCart(); renderCart();
+}
+function removeItem(i){
+  cart.splice(i,1);
+  saveCart(); renderCart();
+}
+
+/* CHECKOUT */
 function goCheckout(){
- closeCart();document.querySelector(".products").style.display="none";
- checkout.style.display="block";
+  closeCart();
+  document.querySelector(".products").style.display="none";
+  document.getElementById("checkout").style.display="block";
 }
 
 function whatsappOrder(){
- let m=`Order:%0A`;
- cart.forEach(i=>m+=`${i.name} x ${i.qty}%0A`);
- window.open(`https://wa.me/94725989935?text=${m}`);
+  const n=name.value,p=phone.value,a=address.value;
+  if(!n||!p||!a) return alert("Fill all fields");
+  let msg=`Order:%0AName:${n}%0APhone:${p}%0AAddress:${a}%0A`;
+  let t=0;
+  cart.forEach(i=>{
+    msg+=`${i.name} x ${i.qty} = Rs.${i.price*i.qty}%0A`;
+    t+=i.price*i.qty;
+  });
+  msg+=`Total Rs.${t}`;
+  window.open(`https://wa.me/94725989935?text=${msg}`);
 }
-save();
 </script>
-
 </body>
-</html>
+  </html>
