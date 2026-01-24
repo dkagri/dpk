@@ -4,28 +4,71 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Live Shop</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
-body{font-family:Arial;background:#f5f5f5;margin:0;padding:0;}
-header{background:#0d6efd;color:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;}
-header h2{margin:0;}
-.cart{cursor:pointer;}
-.products{padding:20px;}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;}
-.card{background:#fff;padding:15px;border-radius:10px;box-shadow:0 5px 10px rgba(0,0,0,.1);text-align:center;}
-.card img{width:100%;height:180px;object-fit:contain;}
-.price{color:#0d6efd;font-weight:bold;margin:5px 0;}
-select,button{width:100%;padding:8px;margin-top:5px;}
-button{background:#0d6efd;color:#fff;border:none;border-radius:5px;}
-#cartModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);}
-.cartBox{background:#fff;max-width:400px;margin:80px auto;padding:15px;border-radius:10px;}
-.cartItem{display:flex;justify-content:space-between;margin:8px 0;}
-.cartItem button{width:auto;padding:5px 8px;}
-#checkout{display:none;padding:20px;}
-input{width:100%;padding:10px;margin:8px 0;}
-.whatsapp{background:#25d366;color:#fff;padding:12px;border:none;width:100%;}
-@media(max-width:600px){.grid{grid-template-columns:1fr;}}
+body{font-family:Arial;background:#f5f5f5;margin:0}
+header{background:#0d6efd;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.cart{cursor:pointer}
+
+/* PRODUCT GRID */
+.products{padding:20px}
+.grid{display:grid;gap:20px}
+
+/* Desktop 5 products */
+@media(min-width:1200px){.grid{grid-template-columns:repeat(5,1fr)}}
+/* Tablet */
+@media(max-width:1199px){.grid{grid-template-columns:repeat(3,1fr)}}
+/* Mobile */
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+
+.card{
+  background:#fff;padding:15px;border-radius:10px;
+  box-shadow:0 5px 10px rgba(0,0,0,.1);text-align:center
+}
+.card img{width:100%;height:160px;object-fit:contain}
+.price{color:#0d6efd;font-weight:bold}
+select,button{width:100%;padding:8px;margin-top:5px}
+button{background:#0d6efd;color:#fff;border:none;border-radius:5px}
+
+/* CART BAR */
+.cart-bar{
+  position:sticky;bottom:0;background:#fff;
+  padding:10px;box-shadow:0 -2px 5px rgba(0,0,0,.1);
+  display:flex;justify-content:space-between;align-items:center
+}
+
+/* CART MODAL */
+#cartModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5)}
+.cartBox{background:#fff;max-width:400px;margin:80px auto;padding:15px;border-radius:10px}
+.cartItem{display:flex;justify-content:space-between;margin:8px 0}
+
+/* CHECKOUT */
+#checkout{display:none;padding:20px}
+input{width:100%;padding:10px;margin:6px 0}
+.whatsapp{background:#25d366;color:#fff;padding:12px;border:none;width:100%}
+
+/* Pagination */
+.pagination{text-align:center;margin:20px}
+.pagination button{width:auto;margin:0 5px}
+
+/* Footer */
+footer{
+  background:#222;color:#fff;text-align:center;
+  padding:15px;font-size:14px
+}
+
+/* Floating WhatsApp */
+.whatsapp-float{
+  position:fixed;bottom:80px;right:20px;
+  background:#25d366;color:#fff;
+  font-size:26px;padding:15px;border-radius:50%
+}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -36,6 +79,18 @@ input{width:100%;padding:10px;margin:8px 0;}
 <section class="products">
   <div class="grid" id="productGrid"></div>
 </section>
+
+<div class="pagination">
+  <button onclick="prevPage()">⬅ Prev</button>
+  <span id="pageInfo"></span>
+  <button onclick="nextPage()">Next ➡</button>
+</div>
+
+<!-- CART BAR -->
+<div class="cart-bar">
+  <div>Total Items: <span id="cartCountBottom">0</span></div>
+  <button onclick="openCart()">View Cart</button>
+</div>
 
 <!-- CART MODAL -->
 <div id="cartModal">
@@ -57,105 +112,88 @@ input{width:100%;padding:10px;margin:8px 0;}
   <button class="whatsapp" onclick="whatsappOrder()">Order via WhatsApp</button>
 </div>
 
+<!-- Floating WhatsApp -->
+<a href="https://wa.me/94725989935" target="_blank" class="whatsapp-float">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
+<footer>
+  © 2026 Live Online Shop. All Rights Reserved.
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
-// ===== CONFIG =====
-const sheetUrl = "https://docs.google.com/spreadsheets/d/1889ifokv_12i44p9yqqqQz0vJfn9W_ne/edit?usp=drivesdk&ouid=111106518495826787577&rtpof=true&sd=true";
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-updateCartCount();
+const sheetUrl="https://docs.google.com/spreadsheets/d/e/2PACX-1vT-khzV32sk21nggqEKQ083HEbitHgS4ojE9z7T7Y9qvQ_JRCHcWBhq-HPT3W8fPA/pub?output=csv";
 
-// ===== LOAD PRODUCTS =====
-fetch(sheetUrl)
-.then(res => res.text())
-.then(data => {
-  const rows = data.split("\n").slice(1); // skip header
-  let html = "";
-  rows.forEach((row,i)=>{
-    if(!row) return;
-    const cols = row.split(",");
-    const id = cols[0];
-    const name = cols[1];
-    const price = parseFloat(cols[2]);
-    const mainImg = cols[4];
+let products=[],cart=JSON.parse(localStorage.getItem("cart"))||[];
+let page=1,perPage=20;
 
-    html += `
-      <div class="card">
-        <img src="${mainImg}" alt="${name}">
-        <h3>${name}</h3>
-        <div class="price">Rs. ${price}</div>
-        <select id="qty-${id}">
-          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-        </select>
-        <button onclick="addToCart('${name}',${price},'qty-${id}')">Add to Cart</button>
-      </div>
-    `;
-  });
-  document.getElementById("productGrid").innerHTML = html;
+Papa.parse(sheetUrl,{
+ download:true,header:true,
+ complete:r=>{products=r.data;render()}
 });
 
-// ===== CART FUNCTIONS =====
-function addToCart(name, price, qtyId){
-  let qty = parseInt(document.getElementById(qtyId).value);
-  let item = cart.find(p => p.name === name);
-  if(item){ item.qty += qty; }
-  else{ cart.push({name, price, qty}); }
-  saveCart();
+function render(){
+ let start=(page-1)*perPage,end=start+perPage;
+ let html="";
+ products.slice(start,end).forEach((p,i)=>{
+ html+=`
+ <div class="card">
+  <img src="${p['Main Image']}">
+  <h4>${p['Product Name']}</h4>
+  <div class="price">Rs.${p['Price (Rs)']}</div>
+  <select id="q${i}">${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join("")}</select>
+  <button onclick="add('${p['Product Name']}',${p['Price (Rs)']},'q${i}')">Add to Cart</button>
+ </div>`;
+ });
+ document.getElementById("productGrid").innerHTML=html;
+ document.getElementById("pageInfo").innerText=`Page ${page}`;
 }
 
-function saveCart(){
-  localStorage.setItem("cart", JSON.stringify(cart));
-  updateCartCount();
+function nextPage(){if(page*perPage<products.length){page++;render()}}
+function prevPage(){if(page>1){page--;render()}}
+
+function add(n,p,q){
+ let qty=parseInt(document.getElementById(q).value);
+ let f=cart.find(i=>i.name===n);
+ f?f.qty+=qty:cart.push({name:n,price:p,qty});
+ save();
 }
 
-function updateCartCount(){
-  let count = 0; cart.forEach(i=>count+=i.qty);
-  document.getElementById("cartCount").innerText = count;
+function save(){
+ localStorage.setItem("cart",JSON.stringify(cart));
+ let c=cart.reduce((a,b)=>a+b.qty,0);
+ cartCount.innerText=cartCountBottom.innerText=c;
 }
 
-// Cart UI
-function openCart(){ document.getElementById("cartModal").style.display="block"; renderCart();}
-function closeCart(){ document.getElementById("cartModal").style.display="none";}
+function openCart(){cartModal.style.display="block";showCart()}
+function closeCart(){cartModal.style.display="none"}
 
-function renderCart(){
-  let box=document.getElementById("cartItems"); let total=0; box.innerHTML="";
-  cart.forEach((i,idx)=>{
-    total+=i.price*i.qty;
-    box.innerHTML+=`
-    <div class="cartItem">
-      <div>${i.name}<br>Rs.${i.price} x ${i.qty}</div>
-      <div>
-        <button onclick="changeQty(${idx},1)">+</button>
-        <button onclick="changeQty(${idx},-1)">-</button>
-        <button onclick="removeItem(${idx})">❌</button>
-      </div>
-    </div>`;
-  });
-  document.getElementById("total").innerText=total;
+function showCart(){
+ let t=0,box=cartItems;box.innerHTML="";
+ cart.forEach((i,x)=>{
+ t+=i.price*i.qty;
+ box.innerHTML+=`
+ <div class="cartItem">
+  ${i.name} x ${i.qty}
+  <button onclick="cart.splice(${x},1);save();showCart()">❌</button>
+ </div>`;
+ });
+ total.innerText=t;
 }
 
-function changeQty(i,c){ cart[i].qty+=c; if(cart[i].qty<=0) cart.splice(i,1); saveCart(); renderCart();}
-function removeItem(i){ cart.splice(i,1); saveCart(); renderCart();}
-
-// Checkout
 function goCheckout(){
-  closeCart();
-  document.querySelector(".products").style.display="none";
-  document.getElementById("checkout").style.display="block";
+ closeCart();document.querySelector(".products").style.display="none";
+ checkout.style.display="block";
 }
 
-// WhatsApp Order
 function whatsappOrder(){
-  const name = document.getElementById("name").value;
-  const phone = document.getElementById("phone").value;
-  const address = document.getElementById("address").value;
-  if(!name || !phone || !address){ alert("Fill all fields"); return; }
-
-  let msg=`Hello, I want to order:%0AName: ${name}%0APhone: ${phone}%0AAddress: ${address}%0A`;
-  let total=0;
-  cart.forEach(i=>{ msg+=`${i.name} x ${i.qty} = Rs.${i.price*i.qty}%0A`; total+=i.price*i.qty; });
-  msg+=`%0ATotal: Rs.${total}`;
-  window.open(`https://wa.me/94725989935?text=${msg}`);
+ let m=`Order:%0A`;
+ cart.forEach(i=>m+=`${i.name} x ${i.qty}%0A`);
+ window.open(`https://wa.me/94725989935?text=${m}`);
 }
+save();
 </script>
 
 </body>
-  </html>
+</html>
