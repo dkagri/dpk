@@ -137,7 +137,8 @@ function render(){
  products.slice(start,end).forEach((p,i)=>{
  html+=`
  <div class="card">
-  <img src="${p['Main Image']}">
+  <img src="${p['Main Image']}"
+  onerror="this.src='https://via.placeholder.com/300'">
   <h4>${p['Product Name']}</h4>
   <div class="price">Rs.${p['Price (Rs)']}</div>
   <select id="q${i}">${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join("")}</select>
