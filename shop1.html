@@ -112,8 +112,7 @@ footer{
 </footer>
 
 <script>
-const sheetUrl =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vT-khzV32sk21nggqEKQ083HEbitHgS4ojE9z7T7Y9qvQ_JRCHcWBhq-HPT3W8fPA/pub?output=csv"
+const sheetUrl="https://docs.google.com/spreadsheets/d/e/2PACX-1vT-khzV32sk21nggqEKQ083HEbitHgS4ojE9z7T7Y9qvQ_JRCHcWBhq-HPT3W8fPA/pub?output=csv";
 
 let products=[], cart=JSON.parse(localStorage.getItem("cart"))||[];
 let currentPage=1, perPage=20;
@@ -121,7 +120,7 @@ let currentPage=1, perPage=20;
 updateCartCount();
 
 /* Simple CSV parser */
-function parseCSV(text){
+function parsecsv(text){
   let rows=[],r=[],c="",q=false;
   for(let ch of text){
     if(ch=='"') q=!q;
@@ -136,7 +135,7 @@ function parseCSV(text){
 fetch(sheetUrl)
 .then(r=>r.text())
 .then(csv=>{
-  const data=parseCSV(csv).slice(1);
+  const data=parsecsv(csv).slice(1);
   products=data.filter(r=>r[0] && Number(r[3])>0);
   renderProducts();
 });
@@ -216,7 +215,7 @@ function goCheckout(){
 }
 
 function whatsappOrder(){
-  let msg=`Order from ${name.value}%0A`;
+  let msg=`Hello my orders are`;
   let t=0;
   cart.forEach(i=>{
     msg+=`${i.name} x ${i.qty} = Rs.${i.price*i.qty}%0A`;
@@ -228,4 +227,4 @@ function whatsappOrder(){
 </script>
 
 </body>
-                                                                         </html>
+  </html>
