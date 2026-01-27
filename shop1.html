@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-body{font-family:Arial;background:#f5f5f5;margin:0}
+body{font-family:Arial;background:#f5f5f5;margin:0;overflow-x:hidden}
 
 /* HEADER */
 header{
@@ -19,18 +19,19 @@ header{
 .header-left{display:flex;align-items:center;gap:12px}
 .menu-btn{font-size:22px;cursor:pointer;user-select:none}
 
-/* SIDE MENU */
+/* SIDE MENU OFF-CANVAS */
 .side-menu{
- position:fixed;top:0;left:-260px;
+ position:fixed;top:0;left:0;
  width:250px;height:100%;
  background:#fff;
  box-shadow:2px 0 10px rgba(0,0,0,.2);
  padding:20px;
- transition:.3s;
+ transform: translateX(-100%);
+ transition: transform .3s ease;
  z-index:2000;
  overflow-y:auto;
 }
-.side-menu.show{left:0}
+.side-menu.show{transform: translateX(0);}
 .side-menu h3{margin-top:0;margin-bottom:10px}
 .side-menu button{
  width:100%;margin:6px 0;
@@ -52,9 +53,10 @@ header{
 
 .card{
  background:#fff;padding:15px;border-radius:10px;
- box-shadow:0 5px 10px rgba(0,0,0,.1);text-align:center
+ box-shadow:0 5px 10px rgba(0,0,0,.1);text-align:center;
+ cursor:pointer;
 }
-.card img{width:100%;height:160px;object-fit:contain;cursor:pointer}
+.card img{width:100%;height:160px;object-fit:contain}
 .price{color:#0d6efd;font-weight:bold}
 select,button{width:100%;padding:8px;margin-top:5px}
 button{background:#0d6efd;color:#fff;border:none;border-radius:5px}
@@ -94,6 +96,15 @@ footer{background:#222;color:#fff;text-align:center;padding:15px}
  0%{background-position:-400px}
  100%{background-position:400px}
 }
+
+/* OVERLAY WHEN MENU OPEN */
+#overlay{
+ display:none;
+ position:fixed;inset:0;
+ background:rgba(0,0,0,0.3);
+ z-index:1500;
+}
+#overlay.show{display:block;}
 </style>
 </head>
 
@@ -109,6 +120,9 @@ footer{background:#222;color:#fff;text-align:center;padding:15px}
  <button onclick="selectCategory('Women/Beauty')"><i class="fas fa-spa"></i> Women / Beauty</button>
  <button onclick="selectCategory('Home Essentials')"><i class="fas fa-home"></i> Home</button>
 </div>
+
+<!-- OVERLAY -->
+<div id="overlay" onclick="closeMenu()"></div>
 
 <header>
  <div class="header-left">
@@ -172,7 +186,6 @@ footer{background:#222;color:#fff;text-align:center;padding:15px}
 
 <script>
 const sheetUrl="https://docs.google.com/spreadsheets/d/e/2PACX-1vT-khzV32sk21nggqEKQ083HEbitHgS4ojE9z7T7Y9qvQ_JRCHcWBhq-HPT3W8fPA/pub?output=csv";
-const CACHE_KEY="shop_products";
 
 let products=[],filteredProducts=[];
 let cart=JSON.parse(localStorage.getItem("cart"))||[];
@@ -193,52 +206,51 @@ Papa.parse(sheetUrl,{
  }
 });
 
+/* MENU FUNCTIONS */
 function toggleMenu(){
  document.getElementById("sideMenu").classList.toggle("show");
+ document.getElementById("overlay").classList.toggle("show");
+}
+function closeMenu(){
+ document.getElementById("sideMenu").classList.remove("show");
+ document.getElementById("overlay").classList.remove("show");
 }
 
 function selectCategory(c){
  activeCategory=c;
  page=1;
- toggleMenu();
+ closeMenu();
  applyFilters();
 }
 
+/* PRODUCTS */
 function showSkeleton(){
  productGrid.innerHTML=Array(perPage).fill(`<div class="skeleton"></div>`).join("");
 }
-
 function applyFilters(){
  let data=[...products];
  if(activeCategory!=="All")
   data=data.filter(p=>p['Category']===activeCategory);
-
  let key=searchInput.value.toLowerCase();
  if(key)
   data=data.filter(p=>
    p['Product Name'].toLowerCase().includes(key) ||
    (p['Description']||'').toLowerCase().includes(key)
   );
-
  filteredProducts=data;
  render();
 }
-
 function render(){
  let start=(page-1)*perPage,end=start+perPage;
  productGrid.innerHTML="";
  filteredProducts.slice(start,end).forEach((p,i)=>{
   productGrid.innerHTML+=`
-  <div class="card" data-id="${p['Product ID']}"
-   data-name="${p['Product Name']}"
-   data-img="${p['Main Image']}"
-   data-desc="${p['Description']||''}"
-   data-price="${p['Price (Rs)']}">
+  <div class="card" onclick="openProduct('${p['Product Name']}','${p['Main Image']}','${p['Description']||''}',${p['Price (Rs)']},'${p['Product ID']}')">
    <img src="${p['Main Image']}" loading="lazy">
    <h4>${p['Product Name']}</h4>
    <div class="price">Rs.${p['Price (Rs)']}</div>
    <select id="q${i}">${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join("")}</select>
-   <button onclick="addToCart('${p['Product Name']}',${p['Price (Rs)']},'q${i}','${p['Product ID']}')">
+   <button onclick="event.stopPropagation(); addToCart('${p['Product Name']}',${p['Price (Rs)']},'q${i}','${p['Product ID']}')">
     Add to Cart
    </button>
   </div>`;
@@ -246,6 +258,7 @@ function render(){
  pageInfo.innerText=`Page ${page}`;
 }
 
+/* CART FUNCTIONS */
 function addToCart(name,price,selectId,id){
  let qty=parseInt(document.getElementById(selectId).value);
  let existing=cart.find(i=>i.id===id);
@@ -254,15 +267,12 @@ function addToCart(name,price,selectId,id){
  updateCartCount();
  showCart();
 }
-
 function updateCartCount(){
  let c=cart.reduce((a,b)=>a+b.qty,0);
  cartCount.innerText=cartCountBottom.innerText=c;
 }
-
 function openCart(){document.getElementById("cartModal").style.display="block";showCart()}
 function closeCart(){document.getElementById("cartModal").style.display="none"}
-
 function showCart(){
  let t=0;
  cartItems.innerHTML="";
@@ -279,7 +289,6 @@ function showCart(){
  });
  total.innerText=t;
 }
-
 function changeQty(i,d){
  cart[i].qty+=d;
  if(cart[i].qty<=0) cart.splice(i,1);
@@ -287,23 +296,24 @@ function changeQty(i,d){
  updateCartCount();
  showCart();
 }
-
 function nextPage(){if(page*perPage<filteredProducts.length){page++;render()}}
 function prevPage(){if(page>1){page--;render()}}
 function searchProducts(){page=1;applyFilters()}
 
+/* PRODUCT MODAL */
 function openProduct(n,i,d,p,id){
- pName.innerText=n;pImg.src=i;pDesc.innerText=d;pPrice.innerText=p;
+ pName.innerText=n;
+ pImg.src=i;
+ pDesc.innerText=d;
+ pPrice.innerText=p;
  currentProductId=id;
- productModal.style.display="block";
+ document.getElementById("productModal").style.display="block";
 }
-function closeProduct(){productModal.style.display="none"}
-
+function closeProduct(){document.getElementById("productModal").style.display="none"}
 function shareProduct(){
  let msg=`🛍️ *${pName.innerText}*\nID: ${currentProductId}\nPrice: Rs.${pPrice.innerText}\nOrder now via WhatsApp`;
  window.open(`https://wa.me/94725989935?text=${encodeURIComponent(msg)}`);
 }
-
 function whatsappOrder(){
  let msg=`Hello 👋\n\n🛒 *My Order Details*\n\n`;
  let t=0;
@@ -317,4 +327,4 @@ function whatsappOrder(){
 </script>
 
 </body>
- </html>
+  </html>
