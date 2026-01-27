@@ -9,12 +9,43 @@
 
 <style>
 body{font-family:Arial;background:#f5f5f5;margin:0}
-header{background:#0d6efd;color:#fff;padding:15px;display:flex;justify-content:space-between}
-.cart{cursor:pointer}
 
+/* HEADER */
+header{
+ background:#0d6efd;color:#fff;padding:15px;
+ display:flex;justify-content:space-between;align-items:center;
+ position:sticky;top:0;z-index:1000;
+}
+.header-left{display:flex;align-items:center;gap:12px}
+.menu-btn{font-size:22px;cursor:pointer;user-select:none}
+
+/* SIDE MENU */
+.side-menu{
+ position:fixed;top:0;left:-260px;
+ width:250px;height:100%;
+ background:#fff;
+ box-shadow:2px 0 10px rgba(0,0,0,.2);
+ padding:20px;
+ transition:.3s;
+ z-index:2000;
+ overflow-y:auto;
+}
+.side-menu.show{left:0}
+.side-menu h3{margin-top:0;margin-bottom:10px}
+.side-menu button{
+ width:100%;margin:6px 0;
+ display:flex;align-items:center;gap:10px;
+ background:#f1f1f1;color:#000;
+ border:none;padding:10px;border-radius:5px;
+ cursor:pointer;
+ text-align:left;
+ font-size:16px;
+}
+.side-menu button i{width:20px;text-align:center}
+
+/* PRODUCTS */
 .products{padding:20px}
 .grid{display:grid;gap:20px}
-
 @media(min-width:1200px){.grid{grid-template-columns:repeat(5,1fr)}}
 @media(max-width:1199px){.grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:600px){.grid{grid-template-columns:1fr}}
@@ -28,36 +59,32 @@ header{background:#0d6efd;color:#fff;padding:15px;display:flex;justify-content:s
 select,button{width:100%;padding:8px;margin-top:5px}
 button{background:#0d6efd;color:#fff;border:none;border-radius:5px}
 
+/* CART BAR */
 .cart-bar{
  position:sticky;bottom:0;background:#fff;
  padding:10px;box-shadow:0 -2px 5px rgba(0,0,0,.1);
- display:flex;justify-content:space-between;align-items:center
+ display:flex;justify-content:space-between
 }
 
-#cartModal,#productModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5)}
+/* MODALS */
+#cartModal,#productModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:3000}
 .cartBox,.productBox{
  background:#fff;max-width:400px;margin:80px auto;
  padding:15px;border-radius:10px
 }
 .cartItem{display:flex;justify-content:space-between;margin:8px 0}
 
+/* OTHER */
 .whatsapp{background:#25d366;color:#fff;padding:12px;border:none;width:100%}
-
 .pagination{text-align:center;margin:20px}
-.pagination button{width:auto;margin:0 5px}
-
-footer{
- background:#222;color:#fff;text-align:center;
- padding:15px;font-size:14px
-}
-
+footer{background:#222;color:#fff;text-align:center;padding:15px}
 .whatsapp-float{
  position:fixed;bottom:80px;right:20px;
  background:#25d366;color:#fff;
  font-size:40px;padding:10px;border-radius:50%
 }
 
-/* 🔄 Skeleton Loader */
+/* SKELETON */
 .skeleton{
  background:linear-gradient(90deg,#eee,#f5f5f5,#eee);
  height:260px;border-radius:10px;
@@ -72,10 +99,30 @@ footer{
 
 <body>
 
+<!-- SIDE CATEGORY MENU -->
+<div id="sideMenu" class="side-menu">
+ <h3>Categories</h3>
+ <button onclick="selectCategory('All')"><i class="fas fa-border-all"></i> All</button>
+ <button onclick="selectCategory('Kitchen Items')"><i class="fas fa-utensils"></i> Kitchen</button>
+ <button onclick="selectCategory('Baby & Kids')"><i class="fas fa-baby"></i> Baby & Kids</button>
+ <button onclick="selectCategory('Electronics/Power Bank')"><i class="fas fa-plug"></i> Electronics</button>
+ <button onclick="selectCategory('Women/Beauty')"><i class="fas fa-spa"></i> Women / Beauty</button>
+ <button onclick="selectCategory('Home Essentials')"><i class="fas fa-home"></i> Home</button>
+</div>
+
 <header>
- <h2>Live Online Shop</h2>
+ <div class="header-left">
+  <i class="fas fa-bars menu-btn" onclick="toggleMenu()"></i>
+  <h2 style="margin:0">Live Online Shop</h2>
+ </div>
  <div class="cart" onclick="openCart()">🛒 Cart (<span id="cartCount">0</span>)</div>
 </header>
+
+<div style="padding:15px">
+ <input type="text" id="searchInput" placeholder="🔍 Search products..."
+  style="width:100%;padding:10px;font-size:16px"
+  onkeyup="searchProducts()">
+</div>
 
 <section class="products">
  <div class="grid" id="productGrid"></div>
@@ -92,6 +139,7 @@ footer{
  <button onclick="openCart()">View Cart</button>
 </div>
 
+<!-- CART MODAL -->
 <div id="cartModal">
  <div class="cartBox">
   <h3>Your Cart</h3>
@@ -102,12 +150,14 @@ footer{
  </div>
 </div>
 
+<!-- PRODUCT MODAL -->
 <div id="productModal">
  <div class="productBox">
   <h3 id="pName"></h3>
   <img id="pImg" style="width:100%;height:200px;object-fit:contain">
   <p id="pDesc"></p>
   <p class="price">Rs.<span id="pPrice"></span></p>
+  <button class="whatsapp" onclick="shareProduct()">📤 Share Product</button>
   <button onclick="closeProduct()">Close</button>
  </div>
 </div>
@@ -119,124 +169,152 @@ footer{
 <footer>© 2026 Live Online Shop. All Rights Reserved.</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
 <script>
 const sheetUrl="https://docs.google.com/spreadsheets/d/e/2PACX-1vT-khzV32sk21nggqEKQ083HEbitHgS4ojE9z7T7Y9qvQ_JRCHcWBhq-HPT3W8fPA/pub?output=csv";
 const CACHE_KEY="shop_products";
 
-let products=[],cart=JSON.parse(localStorage.getItem("cart"))||[];
-let page=1;perPage=20;
-updateCartCount();
+let products=[],filteredProducts=[];
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
+let page=1,perPage=20;
+let activeCategory="All";
+let currentProductId="";
 
-/* 🔄 Skeleton */
-function showSkeleton(){
- productGrid.innerHTML=Array(perPage).fill(`<div class="skeleton"></div>`).join("");
-}
+updateCartCount();
 showSkeleton();
 
-/* 📦 Load from cache first */
-if(localStorage.getItem(CACHE_KEY)){
- products=JSON.parse(localStorage.getItem(CACHE_KEY));
- render();
-}
-
-/* ⚡ Fetch fresh data */
+/* Load Google Sheet */
 Papa.parse(sheetUrl,{
- download:true,header:true,
- complete:r=>{
+ download:true,
+ header:true,
+ complete: r=>{
   products=r.data.filter(p=>p['Product Name']);
-  localStorage.setItem(CACHE_KEY,JSON.stringify(products));
-  render();
+  applyFilters();
  }
 });
 
+function toggleMenu(){
+ document.getElementById("sideMenu").classList.toggle("show");
+}
+
+function selectCategory(c){
+ activeCategory=c;
+ page=1;
+ toggleMenu();
+ applyFilters();
+}
+
+function showSkeleton(){
+ productGrid.innerHTML=Array(perPage).fill(`<div class="skeleton"></div>`).join("");
+}
+
+function applyFilters(){
+ let data=[...products];
+ if(activeCategory!=="All")
+  data=data.filter(p=>p['Category']===activeCategory);
+
+ let key=searchInput.value.toLowerCase();
+ if(key)
+  data=data.filter(p=>
+   p['Product Name'].toLowerCase().includes(key) ||
+   (p['Description']||'').toLowerCase().includes(key)
+  );
+
+ filteredProducts=data;
+ render();
+}
+
 function render(){
  let start=(page-1)*perPage,end=start+perPage;
- let html="";
- products.slice(start,end).forEach((p,i)=>{
- html+=`
- <div class="card"
-  data-id="${p['Product ID']}"
-  data-name="${p['Product Name']}"
-  data-img="${p['Main Image']}"
-  data-desc="${p['Description']||''}"
-  data-price="${p['Price (Rs)']}">
-  <img loading="lazy" src="${p['Main Image']}"
-   onerror="this.src='https://via.placeholder.com/300'">
-  <h4>${p['Product Name']}</h4>
-  <div class="price">Rs.${p['Price (Rs)']}</div>
-  <select id="q${i}">${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join("")}</select>
-  <button onclick="add('${p['Product Name']}',${p['Price (Rs)']},'q${i}')">Add to Cart</button>
- </div>`;
+ productGrid.innerHTML="";
+ filteredProducts.slice(start,end).forEach((p,i)=>{
+  productGrid.innerHTML+=`
+  <div class="card" data-id="${p['Product ID']}"
+   data-name="${p['Product Name']}"
+   data-img="${p['Main Image']}"
+   data-desc="${p['Description']||''}"
+   data-price="${p['Price (Rs)']}">
+   <img src="${p['Main Image']}" loading="lazy">
+   <h4>${p['Product Name']}</h4>
+   <div class="price">Rs.${p['Price (Rs)']}</div>
+   <select id="q${i}">${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join("")}</select>
+   <button onclick="addToCart('${p['Product Name']}',${p['Price (Rs)']},'q${i}','${p['Product ID']}')">
+    Add to Cart
+   </button>
+  </div>`;
  });
- productGrid.innerHTML=html;
  pageInfo.innerText=`Page ${page}`;
-
- document.querySelectorAll(".card img,.card h4").forEach(e=>{
-  e.onclick=()=>{
-   let d=e.parentElement.dataset;
-   openProduct(d.name,d.img,d.desc,d.price);
-  }
- });
 }
 
-function openProduct(n,i,d,p){
- pName.innerText=n;pImg.src=i;pDesc.innerText=d;pPrice.innerText=p;
- productModal.style.display="block";
-}
-function closeProduct(){productModal.style.display="none"}
-
-function nextPage(){if(page*perPage<products.length){page++;render()}}
-function prevPage(){if(page>1){page--;render()}}
-
-function add(n,p,q){
- let qty=parseInt(document.getElementById(q).value);
- let card=document.getElementById(q).closest(".card");
- let id=card.dataset.id;
- let f=cart.find(i=>i.id===id);
- f?f.qty+=qty:cart.push({id,name:n,price:p,qty});
- save();
-}
-
-function save(){
+function addToCart(name,price,selectId,id){
+ let qty=parseInt(document.getElementById(selectId).value);
+ let existing=cart.find(i=>i.id===id);
+ if(existing){existing.qty+=qty;} else {cart.push({id,name,price,qty});}
  localStorage.setItem("cart",JSON.stringify(cart));
  updateCartCount();
+ showCart();
 }
+
 function updateCartCount(){
  let c=cart.reduce((a,b)=>a+b.qty,0);
  cartCount.innerText=cartCountBottom.innerText=c;
 }
 
-function openCart(){cartModal.style.display="block";showCart()}
-function closeCart(){cartModal.style.display="none"}
+function openCart(){document.getElementById("cartModal").style.display="block";showCart()}
+function closeCart(){document.getElementById("cartModal").style.display="none"}
 
 function showCart(){
- let t=0;cartItems.innerHTML="";
+ let t=0;
+ cartItems.innerHTML="";
  cart.forEach((i,x)=>{
- t+=i.price*i.qty;
- cartItems.innerHTML+=`
- <div class="cartItem">
-  <div>${i.name}<br>Rs.${i.price} × ${i.qty}</div>
-  <div>
-   <button onclick="cart[x].qty++;save();showCart()">+</button>
-   <button onclick="cart[x].qty--;if(cart[x].qty<=0)cart.splice(x,1);save();showCart()">−</button>
-  </div>
- </div>`;
+  t+=i.price*i.qty;
+  cartItems.innerHTML+=`
+   <div class="cartItem">
+    <div>${i.name}<br>Rs.${i.price} × ${i.qty}</div>
+    <div>
+     <button onclick="changeQty(${x},1)">+</button>
+     <button onclick="changeQty(${x},-1)">−</button>
+    </div>
+   </div>`;
  });
  total.innerText=t;
 }
 
+function changeQty(i,d){
+ cart[i].qty+=d;
+ if(cart[i].qty<=0) cart.splice(i,1);
+ localStorage.setItem("cart",JSON.stringify(cart));
+ updateCartCount();
+ showCart();
+}
+
+function nextPage(){if(page*perPage<filteredProducts.length){page++;render()}}
+function prevPage(){if(page>1){page--;render()}}
+function searchProducts(){page=1;applyFilters()}
+
+function openProduct(n,i,d,p,id){
+ pName.innerText=n;pImg.src=i;pDesc.innerText=d;pPrice.innerText=p;
+ currentProductId=id;
+ productModal.style.display="block";
+}
+function closeProduct(){productModal.style.display="none"}
+
+function shareProduct(){
+ let msg=`🛍️ *${pName.innerText}*\nID: ${currentProductId}\nPrice: Rs.${pPrice.innerText}\nOrder now via WhatsApp`;
+ window.open(`https://wa.me/94725989935?text=${encodeURIComponent(msg)}`);
+}
+
 function whatsappOrder(){
- let msg=`Hello 👋%0A%0A🛒 *My Order Details* %0A%0A`;
+ let msg=`Hello 👋\n\n🛒 *My Order Details*\n\n`;
  let t=0;
- cart.forEach((i,idx)=>{
-  msg+=`${idx+1}. ${i.name}%0A`;
-  msg+=`   ID: ${i.id}%0A   Qty: ${i.qty}%0A   Rs.${i.price*i.qty}%0A%0A`;
+ cart.forEach((i,x)=>{
+  msg+=`${x+1}. ${i.name}\nID: ${i.id}\nQty: ${i.qty}\nRs.${i.price*i.qty}\n\n`;
   t+=i.price*i.qty;
  });
- msg+=`*Total*: Rs.${t}%0AThank you 🙏`;
- window.open(`https://wa.me/94725989935?text=${msg}`);
+ msg+=`*Total*: Rs.${t}`;
+ window.open(`https://wa.me/94725989935?text=${encodeURIComponent(msg)}`);
 }
 </script>
 
 </body>
-  </html>
+ </html>
