@@ -18,6 +18,22 @@ header{
 }
 .header-left{display:flex;align-items:center;gap:12px}
 .menu-btn{font-size:22px;cursor:pointer;user-select:none}
+.cart{cursor:pointer;position:relative}
+
+/* MINI-CART */
+#miniCart{
+ display:none;
+ position:absolute;top:45px;right:0;
+ width:300px;
+ background:#fff;box-shadow:0 5px 15px rgba(0,0,0,.2);
+ border-radius:10px;padding:10px;
+ z-index:1500;
+ max-height:400px;
+ overflow-y:auto;
+}
+#miniCart.show{display:block;}
+.miniItem{display:flex;justify-content:space-between;margin:6px 0;padding:5px;border-bottom:1px solid #eee}
+.miniItem button{padding:2px 6px;margin-left:2px;background:#0d6efd;color:#fff;border:none;border-radius:3px;cursor:pointer;font-size:12px}
 
 /* SIDE MENU OFF-CANVAS */
 .side-menu{
@@ -46,6 +62,7 @@ header{
 
 /* PRODUCTS */
 .products{padding:20px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
 .grid{display:grid;gap:20px}
 @media(min-width:1200px){.grid{grid-template-columns:repeat(5,1fr)}}
 @media(max-width:1199px){.grid{grid-template-columns:repeat(3,1fr)}}
@@ -53,13 +70,18 @@ header{
 
 .card{
  background:#fff;padding:15px;border-radius:10px;
- box-shadow:0 5px 10px rgba(0,0,0,.1);text-align:center;
+ box-shadow:0 3px 6px rgba(0,0,0,.1);text-align:center;
  cursor:pointer;
+ transition:.3s;
+ position:relative;
+}
+.card:hover{
+ transform:translateY(-5px);
+ box-shadow:0 8px 20px rgba(0,0,0,.15);
 }
 .card img{width:100%;height:160px;object-fit:contain}
 .price{color:#0d6efd;font-weight:bold}
-select,button{width:100%;padding:8px;margin-top:5px}
-button{background:#0d6efd;color:#fff;border:none;border-radius:5px}
+.stock{position:absolute;top:10px;left:10px;padding:2px 6px;border-radius:4px;font-size:12px;color:#fff;font-weight:bold}
 
 /* CART BAR */
 .cart-bar{
@@ -107,7 +129,6 @@ footer{background:#222;color:#fff;text-align:center;padding:15px}
 #overlay.show{display:block;}
 </style>
 </head>
-
 <body>
 
 <!-- SIDE CATEGORY MENU -->
@@ -129,13 +150,21 @@ footer{background:#222;color:#fff;text-align:center;padding:15px}
   <i class="fas fa-bars menu-btn" onclick="toggleMenu()"></i>
   <h2 style="margin:0">Live Online Shop</h2>
  </div>
- <div class="cart" onclick="openCart()">🛒 Cart (<span id="cartCount">0</span>)</div>
+ <div class="cart" onclick="toggleMiniCart()">🛒 Cart (<span id="cartCount">0</span>)</div>
 </header>
 
+<!-- MINI-CART -->
+<div id="miniCart"></div>
+
 <div style="padding:15px">
- <input type="text" id="searchInput" placeholder="🔍 Search products..."
-  style="width:100%;padding:10px;font-size:16px"
-  onkeyup="searchProducts()">
+ <div class="filters">
+   <input type="text" id="searchInput" placeholder="🔍 Search products..." onkeyup="searchProducts()" style="flex:1;padding:10px;font-size:16px">
+   <select id="sortSelect" onchange="sortProducts()" style="padding:10px;font-size:16px">
+     <option value="default">Sort By</option>
+     <option value="low">Price: Low → High</option>
+     <option value="high">Price: High → Low</option>
+   </select>
+ </div>
 </div>
 
 <section class="products">
@@ -202,6 +231,9 @@ Papa.parse(sheetUrl,{
  header:true,
  complete: r=>{
   products=r.data.filter(p=>p['Product Name']);
+  products.forEach(p=>{
+   p['Stock'] = Math.random() > 0.2 ? "In Stock" : "Out of Stock"; // Random stock for demo
+  });
   applyFilters();
  }
 });
@@ -240,12 +272,20 @@ function applyFilters(){
  filteredProducts=data;
  render();
 }
+function sortProducts(){
+ let s=sortSelect.value;
+ if(s==='low') filteredProducts.sort((a,b)=>parseFloat(a['Price (Rs)'])-parseFloat(b['Price (Rs)']));
+ if(s==='high') filteredProducts.sort((a,b)=>parseFloat(b['Price (Rs)'])-parseFloat(a['Price (Rs)']));
+ render();
+}
 function render(){
  let start=(page-1)*perPage,end=start+perPage;
  productGrid.innerHTML="";
  filteredProducts.slice(start,end).forEach((p,i)=>{
+  let stockClass = p['Stock']==="In Stock" ? "green" : "red";
   productGrid.innerHTML+=`
   <div class="card" onclick="openProduct('${p['Product Name']}','${p['Main Image']}','${p['Description']||''}',${p['Price (Rs)']},'${p['Product ID']}')">
+   <span class="stock" style="background:${p['Stock']==='In Stock'?'#28a745':'#dc3545'}">${p['Stock']}</span>
    <img src="${p['Main Image']}" loading="lazy">
    <h4>${p['Product Name']}</h4>
    <div class="price">Rs.${p['Price (Rs)']}</div>
@@ -258,6 +298,27 @@ function render(){
  pageInfo.innerText=`Page ${page}`;
 }
 
+/* MINI-CART */
+function toggleMiniCart(){
+ let mc=document.getElementById("miniCart");
+ mc.classList.toggle("show");
+ showMiniCart();
+}
+function showMiniCart(){
+ let mc=document.getElementById("miniCart");
+ mc.innerHTML="";
+ cart.forEach((i,x)=>{
+  mc.innerHTML+=`<div class="miniItem">
+    <div>${i.name}<br>Rs.${i.price} × ${i.qty}</div>
+    <div>
+     <button onclick="changeQty(${x},1)">+</button>
+     <button onclick="changeQty(${x},-1)">−</button>
+    </div>
+  </div>`;
+ });
+ mc.innerHTML+=cart.length?`<hr><button style="width:100%;padding:10px;background:#0d6efd;color:#fff;border:none;border-radius:5px;" onclick="openCart();toggleMiniCart()">Go to Cart</button>`:'<p style="text-align:center;">Cart is empty</p>';
+}
+
 /* CART FUNCTIONS */
 function addToCart(name,price,selectId,id){
  let qty=parseInt(document.getElementById(selectId).value);
@@ -265,7 +326,7 @@ function addToCart(name,price,selectId,id){
  if(existing){existing.qty+=qty;} else {cart.push({id,name,price,qty});}
  localStorage.setItem("cart",JSON.stringify(cart));
  updateCartCount();
- showCart();
+ showMiniCart();
 }
 function updateCartCount(){
  let c=cart.reduce((a,b)=>a+b.qty,0);
@@ -294,6 +355,7 @@ function changeQty(i,d){
  if(cart[i].qty<=0) cart.splice(i,1);
  localStorage.setItem("cart",JSON.stringify(cart));
  updateCartCount();
+ showMiniCart();
  showCart();
 }
 function nextPage(){if(page*perPage<filteredProducts.length){page++;render()}}
