@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flexi Movers - Moving Made Simple in Auckland | From $60/hr</title>
+    <meta name="description" content="Flexi Movers Auckland - Reliable. Affordable. Stress-Free. From $60/hr. Driver Included, Liability Insurance up to $1M. Call 021 245 6800">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="loader"><div class="spinner"></div></div>
+<div id="progress"></div>
+
+<header>
+    <div class="container">
+        <div class="logo">
+            <img src="images/logo.png" alt="Logo">
+        </div>
+        <div class="menu-toggle"><i class="fas fa-bars"></i></div>
+        <nav>
+            <div class="menu-close"><i class="fas fa-times"></i></div>
+            <ul>
+                <li><a href="#Home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#Services">Services</a></li>
+                <li><a href="#Rates">Our Rates</a></li>
+                <li><a href="#Gallery">Gallery</a></li>
+                <li><a href="#Contact">Contact</a></li>
+            </ul>
+        </nav>
+        <a href="tel:+64212456800" class="btn header-btn">021 245 6800</a>
+    </div>
+</header>
+
+<!-- Hero Section - Inspired by Flyer -->
+<section class="hero" id="Home">
+    <div class="hero-bg"></div>
+    <div class="container hero-grid">
+        <div class="hero-content">
+            <p class="hero-eyebrow">FLEXI MOVERS — YOUR MOVE, OUR PRIORITY</p>
+            <h1>MOVING<br><span class="green">MADE SIMPLE</span><br>IN AUCKLAND</h1>
+            <p class="hero-desc">Reliable. Affordable. Stress-Free. Flexible, efficient, and cost-effective moving solutions for every budget in Auckland.</p>
+            
+            <div class="hero-badges">
+                <div class="h-badge"><i class="fa-solid fa-user-check"></i><span>DRIVER<br>INCLUDED</span></div>
+                <div class="h-badge"><i class="fa-solid fa-shield-halved"></i><span>LIABILITY INSURANCE<br>UP TO $1M</span></div>
+                <div class="h-badge"><i class="fa-solid fa-location-dot"></i><span>AUCKLAND-WIDE<br>SERVICE</span></div>
+                <div class="h-badge"><i class="fa-solid fa-dollar-sign"></i><span>AFFORDABLE<br>RATES</span></div>
+            </div>
+
+            <div class="buttons">
+                <a href="tel:0212456800" class="btn btn-green"><i class="fa-solid fa-phone"></i> GET FREE QUOTE</a>
+                <a href="#Rates" class="btn2">VIEW RATES FROM $60/hr</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="images/safety.jpg" alt="Flexi Movers Vans Auckland" onerror="this.style.display='none'">
+            <div class="hero-trust">Proudly Serving All of Auckland <span>• Sky Tower City</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="services" id="Services">
+    <div class="container">
+        <p class="tagline">OUR SERVICES</p>
+        <h2 class="section-title">Professional Moving Solutions</h2>
+        <div class="service-grid">
+            <div class="service-card"><i class="fa-solid fa-house-chimney"></i><h3>FULL RESIDENTIAL HOUSE MOVES</h3><p>Complete house moving solutions with extreme care.</p></div>
+            <div class="service-card"><i class="fa-solid fa-building"></i><h3>COMMERCIAL & OFFICE</h3><p>Efficient business relocations minimizing downtime.</p></div>
+            <div class="service-card"><i class="fa-solid fa-truck-ramp-box"></i><h3>FURNITURE & APPLIANCE</h3><p>Safe transport for heavy furniture and appliances.</p></div>
+            <div class="service-card"><i class="fa-solid fa-box-open"></i><h3>PACKING & UNPACKING</h3><p>Detail-oriented packing ensuring secure transit.</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- ===================== NEW OUR RATES SECTION (Replaces Fleet) ===================== -->
+<section class="rates" id="Rates">
+    <div class="container">
+        <div class="rates-header">
+            <span class="rates-pill">OUR RATES</span>
+            <h2 class="section-title">Transparent Pricing, No Hidden Fees</h2>
+            <p class="section-subtitle">Choose the perfect vehicle for your move. All rates include driver & GST. Auckland-wide service.</p>
+        </div>
+
+        <div class="rates-grid">
+            <!-- Card 1 -->
+            <div class="rate-card">
+                <div class="rate-volume">9m³</div>
+                <div class="rate-img"><img src="images/Toyota.jpg" alt="Toyota Hiace High Roof"></div>
+                <div class="rate-body">
+                    <h3>TOYOTA HIACE<br>HIGH ROOF CARGO</h3>
+                    <div class="rate-included"><i class="fa-solid fa-user"></i> DRIVER INCLUDED</div>
+                    <div class="rate-price"><small>FROM</small><span>$60</span><small>/hr</small></div>
+                    <ul class="rate-features">
+                        <li><i class="fa-solid fa-check"></i> Perfect for studio / 1-bed moves</li>
+                        <li><i class="fa-solid fa-check"></i> Small furniture & boxes</li>
+                        <li><i class="fa-solid fa-check"></i> Liability Insurance up to $1M</li>
+                    </ul>
+                    <a href="tel:0212456800" class="btn btn-green btn-full">BOOK NOW - $60/hr</a>
+                </div>
+            </div>
+
+            <!-- Card 2 - Popular -->
+            <div class="rate-card popular">
+                <div class="popular-badge">MOST POPULAR</div>
+                <div class="rate-volume blue">15m³</div>
+                <div class="rate-img"><img src="images/BENZ.jpg" alt="Mercedes Sprinter"></div>
+                <div class="rate-body">
+                    <h3>MERCEDES-BENZ<br>SPRINTER</h3>
+                    <div class="rate-included blue-bg"><i class="fa-solid fa-user"></i> DRIVER INCLUDED</div>
+                    <div class="rate-price"><small>FROM</small><span>$70</span><small>/hr</small></div>
+                    <ul class="rate-features">
+                        <li><i class="fa-solid fa-check"></i> Ideal for 1-2 bedroom homes</li>
+                        <li><i class="fa-solid fa-check"></i> Medium furniture & appliances</li>
+                        <li><i class="fa-solid fa-check"></i> Liability Insurance up to $1M</li>
+                    </ul>
+                    <a href="tel:0212456800" class="btn btn-full btn-dark">BOOK NOW - $70/hr</a>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="rate-card">
+                <div class="rate-volume">20m³</div>
+                <div class="rate-img"><img src="images/TRUCK.jpg" alt="Moving Box Truck"></div>
+                <div class="rate-body">
+                    <h3>MOVING TRUCK<br>(BOX TRUCK)</h3>
+                    <div class="rate-included"><i class="fa-solid fa-people-group"></i> 2 MOVERS INCLUDED</div>
+                    <div class="rate-price"><small>FROM</small><span>$120</span><small>/hr</small></div>
+                    <ul class="rate-features">
+                        <li><i class="fa-solid fa-check"></i> Best for 2-3 bedroom houses</li>
+                        <li><i class="fa-solid fa-check"></i> Heavy lifting handled</li>
+                        <li><i class="fa-solid fa-check"></i> Liability Insurance up to $1M</li>
+                    </ul>
+                    <a href="tel:0212456800" class="btn btn-green btn-full">BOOK NOW - $120/hr</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="rates-note">
+            <i class="fa-solid fa-circle-info"></i>
+            <p><b>Note:</b> Minimum 2 hours. Fuel & GST included. Auckland-wide. Additional mover available for $35/hr. Call for exact quote.</p>
+        </div>
+    </div>
+</section>
+
+<!-- FREE QUOTE BANNER - From Flyer -->
+<section class="quote-banner">
+    <div class="container">
+        <div class="qb-grid">
+            <div class="qb-left">
+                <div class="qb-icon"><i class="fa-solid fa-phone"></i></div>
+                <div>
+                    <h3>GET YOUR <span>FREE QUOTE TODAY!</span></h3>
+                    <a href="tel:0212456800" class="qb-number">021 245 6800</a>
+                    <p>CALL OR TEXT US ANYTIME</p>
+                </div>
+            </div>
+            <div class="qb-right">
+                <i class="fa-solid fa-box"></i>
+                <div><p class="script">Your Move,</p><p class="script green">Our Priority.</p></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trust Section - From Flyer Bottom -->
+<section class="trust-badges">
+    <div class="container">
+        <div class="trust-grid">
+            <div class="t-badge"><i class="fa-solid fa-shield-halved"></i><div><b>RELIABLE</b><span>You can count on us</span></div></div>
+            <div class="t-badge"><i class="fa-solid fa-face-smile"></i><div><b>FRIENDLY</b><span>We care about your move</span></div></div>
+            <div class="t-badge"><i class="fa-solid fa-star"></i><div><b>PROFESSIONAL</b><span>Trained team, quality service</span></div></div>
+            <div class="t-badge"><i class="fa-solid fa-shield-check"></i><div><b>FULLY INSURED</b><span>Your belongings are in safe hands</span></div></div>
+        </div>
+        <div class="auckland-badge"><i class="fa-solid fa-location-dot"></i> PROUDLY SERVING ALL OF AUCKLAND</div>
+    </div>
+</section>
+
+<!-- Stats -->
+<section class="stats">
+    <div class="container">
+        <div class="stat-box"><h2>4.9 / 5.0</h2><p>GOOGLE RATING</p></div>
+        <div class="stat-box"><h2><span class="counter" data-target="1500">0</span>+</h2><p>AUCKLAND MOVES YEARLY</p></div>
+        <div class="stat-box"><h2>100%</h2><p>RELIABILITY GUARANTEED</p></div>
+        <div class="stat-box"><h2>10+</h2><p>YEARS EXPERIENCE</p></div>
+    </div>
+</section>
+
+<!-- About -->
+<section class="about" id="about">
+    <div class="container about-grid">
+        <div class="about-text">
+            <p class="tagline">COMPANY PROFILE</p>
+            <h2>ABOUT <span class="highlight-green">FLEXI MOVERS.</span></h2>
+            <div class="about-block">
+                <p class="sub-title-green">OUR MISSION</p>
+                <p>Founded in Auckland, Flexi Movers Ltd began with a simple mission: to provide the local community with a relocation service that is as flexible as it is reliable.</p>
+                <div class="mission-quote"><p><em>"Moving isn't just about boxes; it's about shifting lives."</em></p></div>
+            </div>
+            <div class="about-block">
+                <p class="sub-title-green">CORE VALUES</p>
+                <div class="values-grid">
+                    <div class="value-card"><span class="val-num">01.</span><h4>TEAM CULTURE</h4><p>Professionals who care about people.</p></div>
+                    <div class="value-card"><span class="val-num">02.</span><h4>PRECISION</h4><p>Detail-oriented planning for seamless moves.</p></div>
+                    <div class="value-card"><span class="val-num">03.</span><h4>EMPATHY</h4><p>We understand moving is stressful.</p></div>
+                    <div class="value-card"><span class="val-num">04.</span><h4>EXCELLENCE</h4><p>Highest standards in every move.</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="about-image"><img src="https://images.unsplash.com/photo-1600518464441-9154a4dea21b?w=600&auto=format&fit=crop" alt="Movers"></div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+    <div class="container">
+        <p class="tagline-light">CONTACT QUICK LINK</p>
+        <h2>Book your move online, today.</h2>
+        <p>Our team is standing by to provide a free, no-obligation quote today.</p>
+        <a href="#Contact" class="btn btn-green">SEND INQUIRY</a>
+    </div>
+</section>
+
+<!-- Contact -->
+<section class="contact" id="Contact">
+    <div class="container">
+        <p class="tagline">GET IN TOUCH</p>
+        <h2 class="section-title">CONTACT <span class="highlight-green">THE CREW.</span></h2>
+        <div class="contact-grid">
+            <div class="contact-info">
+                <p class="sub-title-green">CONTACT DETAILS</p>
+                <div class="detail-row"><span>PHONE</span><strong>021 245 6800</strong></div>
+                <div class="detail-row"><span>EMAIL</span><strong>FLEXIMOVERSNZ@GMAIL.COM</strong></div>
+                <div class="detail-row"><span>BASE</span><strong>AUCKLAND, NEW ZEALAND</strong></div>
+                <div class="detail-row"><span>HOURS</span><strong>MON-SAT: 7AM - 8PM</strong></div>
+                <div class="quote-guarantee"><p class="guarantee-title">QUOTE GUARANTEE</p><p>We respond to all requests within 2 business hours.</p></div>
+                <div class="contact-extra-badges">
+                    <span><i class="fa-solid fa-check"></i> Driver Included</span>
+                    <span><i class="fa-solid fa-check"></i> Insurance up to $1M</span>
+                    <span><i class="fa-solid fa-check"></i> From $60/hr</span>
+                </div>
+            </div>
+            <div class="contact-form">
+                <p class="sub-title-green">MOVING INQUIRY FORM</p>
+                <form id="inquiryForm">
+                    <input type="text" placeholder="NAME" required>
+                    <input type="email" placeholder="EMAIL" required>
+                    <input type="tel" placeholder="PHONE" required>
+                    <select required>
+                        <option value="">SELECT VEHICLE</option>
+                        <option>Toyota Hiace 9m³ - From $60/hr</option>
+                        <option>Mercedes Sprinter 15m³ - From $70/hr</option>
+                        <option>Moving Truck 20m³ - From $120/hr (2 Movers)</option>
+                    </select>
+                    <textarea rows="5" placeholder="MESSAGE / MOVING DETAILS" required></textarea>
+                    <button type="submit" class="btn btn-green btn-full">SEND REQUEST</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="map">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d204290.72251915993!2d174.61469315897858!3d-36.86269389270183!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6d0d47fb5a9ce6fb%3A0x500ef6143a29917!2sAuckland%2C%20New%20Zealand!5e0!3m2!1sen!2slk!4v1784451093311!5m2!1sen!2slk" width="100%" height="380" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+</section>
+
+<footer>
+    <div class="container footer-grid">
+        <div><h3>FLEXI MOVERS</h3><p>Your Move, Our Priority. Reliable. Affordable. Stress-Free. Auckland-wide service from $60/hr.</p><p style="margin-top:10px;font-weight:700;color:#fff;">021 245 6800</p></div>
+        <div><h3>Our Rates</h3><ul><li>9m³ Hiace - $60/hr - Driver Incl.</li><li>15m³ Sprinter - $70/hr - Driver Incl.</li><li>20m³ Truck - $120/hr - 2 Movers Incl.</li></ul></div>
+        <div><h3>Quick Links</h3><ul><li><a href="#Home">Home</a></li><li><a href="#Rates">Our Rates</a></li><li><a href="#Services">Services</a></li><li><a href="#Contact">Contact</a></li></ul></div>
+        <div><h3>Follow Us</h3><div class="social"><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-whatsapp"></i></a></div></div>
+    </div>
+    <div class="copyright"><p>© <span id="year">2026</span> FLEXI MOVERS LTD. ALL RIGHTS RESERVED. | Liability Insurance up to $1M | Fully Insured</p></div>
+</footer>
+
+<a href="https://wa.me/+64212456800" class="whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
+<a href="tel:+64212456800" class="call-btn"><i class="fa-solid fa-phone"></i></a>
+<button id="topBtn"><i class="fa-solid fa-arrow-up"></i></button>
+
+<script src="js/script.js"></script>
+</body>
+</html>
